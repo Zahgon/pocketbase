@@ -25,39 +25,12 @@ class LogService(BaseService):
         query_params: dict[str, Any] = {},
     ) -> ListResult[LogRequest]:
         """Returns paginated logged requests list."""
-        query_params.update({"page": page, "perPage": per_page})
-        response_data = self.client.send(
-            "/api/logs/",
-            {"method": "GET", "params": query_params},
-        )
-        items: list[LogRequest] = []
-        if "items" in response_data:
-            response_data["items"] = response_data["items"] or []
-            for item in response_data["items"]:
-                items.append(LogRequest(item))
-        return ListResult(
-            response_data.get("page", 1),
-            response_data.get("perPage", 0),
-            response_data.get("totalItems", 0),
-            response_data.get("totalPages", 0),
-            items,
-        )
+        pass
 
     def get(self, id: str, query_params: dict[str, Any] = {}) -> LogRequest:
         """Returns a single logged request by its id."""
-        return LogRequest(
-            self.client.send(
-                "/api/logs/" + quote(id),
-                {"method": "GET", "params": query_params},
-            )
-        )
+        pass
 
     def get_stats(self, query_params: dict[str, Any] = {}) -> list[HourlyStats]:
         """Returns request logs statistics."""
-        return [
-            HourlyStats(total=stat["total"], date=to_datetime(stat["date"]))
-            for stat in self.client.send(
-                "/api/logs/stats",
-                {"method": "GET", "params": query_params},
-            )
-        ]
+        pass

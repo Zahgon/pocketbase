@@ -48,88 +48,22 @@ class Client:
 
     def _send(self, path: str, req_config: dict[str, Any]) -> httpx.Response:
         """Sends an api http request returning response object."""
-        config: dict[str, Any] = {"method": "GET"}
-        config.update(req_config)
-        # check if Authorization header can be added
-        if self.auth_store.token and (
-            "headers" not in config or "Authorization" not in config["headers"]
-        ):
-            config["headers"] = config.get("headers", {})
-            config["headers"].update({"Authorization": self.auth_store.token})
-        # build url + path
-        url = self.build_url(path)
-        # send the request
-        method = config.get("method", "GET")
-        params = config.get("params", None)
-        headers = config.get("headers", None)
-        body: dict[str, Any] | None = config.get("body", None)
-        # handle requests including files as multipart:
-        data: dict[str, Any] | None = {}
-        files = ()
-        for k, v in (body if isinstance(body, dict) else {}).items():
-            if isinstance(v, FileUpload):
-                files += v.get(k)
-            else:
-                data[k] = v
-        if len(files) > 0:
-            # discard body, switch to multipart encoding
-            body = None
-        else:
-            # discard files+data (do not use multipart encoding)
-            files = None
-            data = None
-        try:
-            response = self.http_client.request(
-                method=method,
-                url=url,
-                params=params,
-                headers=headers,
-                json=body,
-                data=data,
-                files=files,  # type: ignore
-                timeout=self.timeout,
-            )
-        except Exception as e:
-            raise ClientResponseError(
-                f"General request error. Original error: {e}",
-                original_error=e,
-            )
-        return response
+        pass
 
     def collection(self, id_or_name: str) -> RecordService:
         """Returns the RecordService associated to the specified collection."""
-        if id_or_name not in self.record_service:
-            self.record_service[id_or_name] = RecordService(self, id_or_name)
-        return self.record_service[id_or_name]
+        pass
 
     def send_raw(self, path: str, req_config: dict[str, Any]) -> bytes:
         """Sends an api http request returning raw bytes response."""
-        response = self._send(path, req_config)
-        return response.content
+        pass
 
     def send(self, path: str, req_config: dict[str, Any]) -> Any:
         """Sends an api http request."""
-        response = self._send(path, req_config)
-        try:
-            data = response.json()
-        except Exception:
-            data = None
-        if response.status_code >= 400:
-            raise ClientResponseError(
-                f"Response error. Status code:{response.status_code}",
-                url=str(response.url),
-                status=response.status_code,
-                data=data,
-            )
-        return data
+        pass
 
     def build_url(self, path: str) -> str:
-        url = self.base_url
-        if not self.base_url.endswith("/"):
-            url += "/"
-        if path.startswith("/"):
-            path = path[1:]
-        return url + path
+        pass
 
     # TODO: add deprecated decorator
     def get_file_url(
@@ -138,8 +72,8 @@ class Client:
         filename: str,
         query_params: dict[str, Any] | None = None,
     ):
-        return self.files.get_url(record, filename, query_params)
+        pass
 
     # TODO: add deprecated decorator
     def get_file_token(self) -> str:
-        return self.files.get_token()
+        pass

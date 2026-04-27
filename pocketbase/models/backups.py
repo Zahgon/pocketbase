@@ -13,7 +13,4 @@ class Backup(BaseModel):
     size: int
 
     def load(self, data: dict[str, Any]) -> None:
-        super().load(data)
-        self.key = data.get("key", "")
-        self.modified = to_datetime(data.pop("modified", ""))
-        self.size = data.get("size", 0)
+        pass

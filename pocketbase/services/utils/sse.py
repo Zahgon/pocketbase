@@ -43,60 +43,13 @@ class EventLoop(threading.Thread):
 
     def _read(self):
         """Read the incoming event source stream and yield event chunks"""
-        data = b""
-        with self.client.stream(
-            self.method,
-            self.url,
-            headers=self.headers,
-            data=self.payload,
-            timeout=None,
-        ) as r:
-            for chunk in r.iter_bytes():
-                for line in chunk.splitlines(True):
-                    data += line
-                    if data.endswith((b"\r\r", b"\n\n", b"\r\n\r\n")):
-                        yield data
-                        data = b""
+        pass
 
     def _events(self):
-        for chunk in self._read():
-            event = Event()
-            for line in chunk.splitlines():
-                line = line.decode(self.encoding)
-                if not line.strip() or line.startswith(self.FIELD_SEPARATOR):
-                    continue
-                data = line.split(self.FIELD_SEPARATOR, 1)
-                field = data[0]
-                if field not in event.__dict__:
-                    continue
-                if len(data) > 1:
-                    if data[1].startswith(" "):
-                        value = data[1][1:]
-                    else:
-                        value = data[1]
-                else:
-                    value = ""
-                if field == "data":
-                    event.data += value + "\n"
-                else:
-                    setattr(event, field, value)
-            if not event.data:
-                continue
-            if event.data.endswith("\n"):
-                event.data = event.data[0:-1]
-            event.event = event.event or "message"
-            yield event
+        pass
 
     def run(self):
-        while not self.kill:
-            try:
-                for event in self._events():
-                    if self.kill:
-                        break
-                    if event.event in self.listeners:
-                        self.listeners[event.event](event)
-            except Exception:
-                self.kill = True
+        pass
 
 
 class SSEClient:
@@ -129,16 +82,13 @@ class SSEClient:
     def add_event_listener(
         self, event: str, callback: Callable[[Any], None]
     ) -> None:
-        self._listeners[event] = callback
-        self._loop_thread.listeners = self._listeners
+        pass
 
     def remove_event_listener(
         self, event: str, callback: Callable[[Any], None]
     ) -> None:
-        if event in self._listeners:
-            self._listeners.pop(event)
-            self._loop_thread.listeners = self._listeners
+        pass
 
     def close(self) -> None:
         # TODO: does not work like this
-        self._loop_thread.kill = True
+        pass

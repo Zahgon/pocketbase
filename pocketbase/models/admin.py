@@ -10,6 +10,4 @@ class Admin(BaseModel):
     email: str
 
     def load(self, data: dict[str, Any]) -> None:
-        super().load(data)
-        self.avatar = data.get("avatar", 0)
-        self.email = data.get("email", "")
+        pass

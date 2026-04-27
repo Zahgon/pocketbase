@@ -11,7 +11,7 @@ class CollectionService(CrudService[Collection]):
         return Collection(data)
 
     def base_crud_path(self) -> str:
-        return "/api/collections"
+        pass
 
     def import_collections(
         self,
@@ -26,15 +26,4 @@ class CollectionService(CrudService[Collection]):
         that are not present in the imported configuration, WILL BE DELETED
         (including their related records data)!
         """
-        self.client.send(
-            self.base_crud_path() + "/import",
-            {
-                "method": "PUT",
-                "params": query_params,
-                "body": {
-                    "collections": collections,
-                    "deleteMissing": delete_missing,
-                },
-            },
-        )
-        return True
+        pass

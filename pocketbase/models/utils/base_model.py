@@ -35,11 +35,9 @@ class BaseModel(ABC):
 
     def load(self, data: dict[str, Any]) -> None:
         """Loads `data` into the current model."""
-        self.id = data.pop("id", "")
-        self.created = to_datetime(data.pop("created", ""))
-        self.updated = to_datetime(data.pop("updated", ""))
+        pass
 
     @property
     def is_new(self) -> bool:
         """Returns whether the current loaded data represent a stored db record."""
-        return not self.id
+        pass

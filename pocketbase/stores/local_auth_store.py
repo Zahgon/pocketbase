@@ -27,42 +27,25 @@ class LocalAuthStore(BaseAuthStore):
 
     @property
     def token(self) -> str:
-        data = self._storage_get(self.complete_filepath)
-        if not data or "token" not in data:
-            return ""
-        return data["token"]
+        pass
 
     @property
     def model(self) -> Record | Admin | None:
-        data = self._storage_get(self.complete_filepath)
-        if not data or "model" not in data:
-            return None
-        return data["model"]
+        pass
 
     def save(
         self, token: str = "", model: Record | Admin | None = None
     ) -> None:
-        self._storage_set(
-            self.complete_filepath, {"token": token, "model": model}
-        )
-        super().save(token, model)
+        pass
 
     def clear(self) -> None:
-        self._storage_remove(self.complete_filepath)
-        super().clear()
+        pass
 
     def _storage_set(self, key: str, value: Any) -> None:
-        with open(key, "wb") as f:
-            pickle.dump(value, f)
+        pass
 
     def _storage_get(self, key: str) -> Any:
-        try:
-            with open(key, "rb") as f:
-                value = pickle.load(f)
-            return value
-        except FileNotFoundError:
-            return {}
+        pass
 
     def _storage_remove(self, key: str) -> None:
-        if os.path.exists(key):
-            os.remove(key)
+        pass

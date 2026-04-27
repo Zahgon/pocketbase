@@ -29,7 +29,7 @@ class RecordAuthResponse:
 
     @property
     def is_valid(self) -> bool:
-        return validate_token(self.token)
+        pass
 
 
 @dataclass
@@ -62,7 +62,7 @@ class RecordService(CrudService[Record]):
         return Record(data)
 
     def base_crud_path(self) -> str:
-        return self.base_collection_path() + "/records"
+        pass
 
     def update(
         self,
@@ -74,18 +74,7 @@ class RecordService(CrudService[Record]):
         If the current `client.auth_store.model` matches with the updated id, then
         on success the `client.auth_store.model` will be updated with the result.
         """
-        item = super().update(
-            id, body_params=body_params, query_params=query_params
-        )
-        model = self.client.auth_store.model
-        if not isinstance(model, Record):
-            return item
-        if model.id == item.id and (
-            model.collection_id == self.collection_id_or_name
-            or model.collection_name == self.collection_id_or_name
-        ):
-            self.client.auth_store.save(self.client.auth_store.token, item)
-        return item
+        pass
 
     def delete(
         self, id: str, query_params: dict[str, Any] | None = None
@@ -94,63 +83,33 @@ class RecordService(CrudService[Record]):
         If the current `client.auth_store.model` matches with the deleted id,
         then on success the `client.auth_store` will be cleared.
         """
-        success = super().delete(id, query_params)
-        model = self.client.auth_store.model
-        if not isinstance(model, Record):
-            return success
-        if (
-            success
-            and model.id == id
-            and (
-                model.collection_id == self.collection_id_or_name
-                or model.collection_name == self.collection_id_or_name
-            )
-        ):
-            self.client.auth_store.clear()
-        return success
+        pass
 
     def base_collection_path(self) -> str:
         """Returns the current collection service base path."""
-        return "/api/collections/" + quote(self.collection_id_or_name)
+        pass
 
     def subscribe(self, callback: Callable[[MessageData], None]) -> None:
         """Subscribe to realtime changes of any record from the collection."""
-        return self.client.realtime.subscribe(
-            self.collection_id_or_name, callback
-        )
+        pass
 
     def unsubscribe(self, *record_ids: str) -> None:
         """Unsubscribe to the realtime changes of a single record in the collection."""
-        if record_ids and len(record_ids) > 0:
-            subs: list[str] = []
-            for id in record_ids:
-                subs.append(self.collection_id_or_name + "/" + id)
-            return self.client.realtime.unsubscribe(subs)
-        return self.client.realtime.unsubscribe_by_prefix(
-            self.collection_id_or_name
-        )
+        pass
 
     # TODO: add deprecated decorator
     def subscribeOne(
         self, record_id: str, callback: Callable[[MessageData], None]
     ) -> None:
         """Subscribe to the realtime changes of a single record in the collection."""
-        return self.client.realtime.subscribe(
-            self.collection_id_or_name + "/" + record_id, callback
-        )
+        pass
 
     # TODO: add deprecated decorator
     def get_file_url(
         self, record: Record, filename: str, query_params: dict[str, Any] = {}
     ) -> str:
         """Builds and returns an absolute record file url."""
-        base_url = self.client.base_url
-        if base_url.endswith("/"):
-            base_url = base_url[:-1]
-        result = f"{base_url}/api/files/{record.collection_id}/{record.id}/{filename}"
-        if query_params:
-            result += "?" + urlencode(query_params)
-        return result
+        pass
 
     # ------------
     # Auth handers
@@ -160,43 +119,13 @@ class RecordService(CrudService[Record]):
         self, response_data: dict[str, Any]
     ) -> RecordAuthResponse:
         """Prepare successful collection authorization response."""
-        record = self.decode(response_data.pop("record", {}))
-        token = response_data.pop("token", "")
-        if token and record:
-            self.client.auth_store.save(token, record)
-        return RecordAuthResponse(token=token, record=record, **response_data)  # type: ignore
+        pass
 
     def list_auth_methods(
         self, query_params: dict[str, Any] | None = None
     ) -> AuthMethodsList:
         """Returns all available collection auth methods."""
-        response_data = self.client.send(
-            self.base_collection_path() + "/auth-methods",
-            {"method": "GET", "params": query_params},
-        )
-        username_password = response_data.pop("usernamePassword", False)
-        email_password = response_data.pop("emailPassword", False)
-
-        def apply_pythonic_keys(ap: dict[str, Any]) -> dict[str, Any]:
-            pythonic_keys_ap = {
-                camel_to_snake(
-                    key, getattr(self.client, "auto_snake_case", True)
-                ).replace("@", ""): value
-                for key, value in ap.items()
-            }
-            return pythonic_keys_ap
-
-        auth_providers = [
-            AuthProviderInfo(**auth_provider)
-            for auth_provider in map(
-                apply_pythonic_keys, response_data.get("authProviders", [])
-            )
-        ]
-        return AuthMethodsList(
-            username_password=username_password,
-            email_password=email_password,
-            auth_providers=auth_providers,
-        )
+        pass
 
     def auth_with_password(
         self,
@@ -213,20 +142,7 @@ class RecordService(CrudService[Record]):
         - the authentication token
         - the authenticated record model
         """
-        body_params = body_params or {}
-        body_params.update(
-            {"identity": username_or_email, "password": password}
-        )
-        response_data = self.client.send(
-            self.base_collection_path() + "/auth-with-password",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-                "headers": {"Authorization": ""},
-            },
-        )
-        return self.auth_response(response_data)
+        pass
 
     def auth_with_oauth2(
         self,
@@ -247,25 +163,7 @@ class RecordService(CrudService[Record]):
         - the authenticated record model
         - the OAuth2 account data (eg. name, email, avatar, etc.)
         """
-        body_params = body_params or {}
-        body_params.update(
-            {
-                "provider": provider,
-                "code": code,
-                "codeVerifier": code_verifier,
-                "redirectUrl": redirect_url,
-                "createData": create_data,
-            }
-        )
-        response_data = self.client.send(
-            self.base_collection_path() + "/auth-with-oauth2",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
-        return self.auth_response(response_data)
+        pass
 
     def auth_refresh(
         self,
@@ -278,12 +176,7 @@ class RecordService(CrudService[Record]):
 
         On success this method also automatically updates the client's AuthStore.
         """
-        return self.auth_response(
-            self.client.send(
-                self.base_collection_path() + "/auth-refresh",
-                {"method": "POST", "params": query_params, "body": body_params},
-            )
-        )
+        pass
 
     def request_email_change(
         self,
@@ -295,13 +188,7 @@ class RecordService(CrudService[Record]):
         Asks to change email of the current authenticated record instance the new address
         receives an email with a confirmation token that needs to be confirmed with confirmEmailChange()
         """
-        body_params = body_params or {}
-        body_params.update({"newEmail": newEmail})
-        self.client.send(
-            self.base_collection_path() + "/request-email-change",
-            {"method": "POST", "params": query_params, "body": body_params},
-        )
-        return True
+        pass
 
     def confirm_email_change(
         self,
@@ -313,13 +200,7 @@ class RecordService(CrudService[Record]):
         """
         Confirms Email Change by with the confirmation token and confirm with users password
         """
-        body_params = body_params or {}
-        body_params.update({"token": token, "password": password})
-        self.client.send(
-            self.base_collection_path() + "/confirm-email-change",
-            {"method": "POST", "params": query_params, "body": body_params},
-        )
-        return True
+        pass
 
     def request_password_reset(
         self,
@@ -328,17 +209,7 @@ class RecordService(CrudService[Record]):
         query_params: dict[str, Any] | None = None,
     ) -> bool:
         """Sends auth record password reset request."""
-        body_params = body_params or {}
-        body_params.update({"email": email})
-        self.client.send(
-            self.base_collection_path() + "/request-password-reset",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
-        return True
+        pass
 
     def request_verification(
         self,
@@ -347,17 +218,7 @@ class RecordService(CrudService[Record]):
         query_params: dict[str, Any] | None = None,
     ) -> bool:
         """Sends email verification request."""
-        body_params = body_params or {}
-        body_params.update({"email": email})
-        self.client.send(
-            self.base_collection_path() + "/request-verification",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
-        return True
+        pass
 
     def confirm_password_reset(
         self,
@@ -368,24 +229,7 @@ class RecordService(CrudService[Record]):
         query_params: dict[str, Any] | None = None,
     ) -> bool:
         """Confirms auth record password reset request"""
-        body_params = body_params or {}
-        body_params.update(
-            {
-                "token": password_reset_token,
-                "password": password,
-                "passwordConfirm": password_confirm,
-            }
-        )
-
-        self.client.send(
-            self.base_collection_path() + "/confirm-password-reset",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
-        return True
+        pass
 
     def confirm_verification(
         self,
@@ -394,17 +238,7 @@ class RecordService(CrudService[Record]):
         query_params: dict[str, Any] | None = None,
     ) -> bool:
         """Confirms email verification request."""
-        body_params = body_params or {}
-        body_params.update({"token": token})
-        self.client.send(
-            self.base_collection_path() + "/confirm-verification",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
-        return True
+        pass
 
     # TODO: add deprecated decorator
     def authRefresh(
@@ -415,7 +249,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use auth_refresh instead.
         """
-        return self.auth_refresh(body_params, query_params)
+        pass
 
     # TODO: add deprecated decorator
     def requestEmailChange(
@@ -427,7 +261,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use request_email_change instead.
         """
-        return self.request_email_change(newEmail, body_params, query_params)
+        pass
 
     # TODO: add deprecated decorator
     def confirmEmailChange(
@@ -440,9 +274,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use confirm_email_change instead.
         """
-        return self.confirm_email_change(
-            token, password, body_params, query_params
-        )
+        pass
 
     # TODO: add deprecated decorator
     def requestPasswordReset(
@@ -454,7 +286,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use request_password_reset instead.
         """
-        return self.request_password_reset(email, body_params, query_params)
+        pass
 
     # TODO: add deprecated decorator
     def requestVerification(
@@ -466,7 +298,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use request_verification instead.
         """
-        return self.request_verification(email, body_params, query_params)
+        pass
 
     # TODO: add deprecated decorator
     def confirmPasswordReset(
@@ -480,13 +312,7 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use confirm_password_reset instead.
         """
-        return self.confirm_password_reset(
-            password_reset_token,
-            password,
-            password_confirm,
-            body_params,
-            query_params,
-        )
+        pass
 
     # TODO: add deprecated decorator
     def confirmVerification(
@@ -498,4 +324,4 @@ class RecordService(CrudService[Record]):
         """
         Deprecated: Use confirm_verification instead.
         """
-        return self.confirm_verification(token, body_params, query_params)
+        pass

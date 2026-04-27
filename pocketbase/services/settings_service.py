@@ -10,10 +10,7 @@ class SettingsService(BaseService):
         self, query_params: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Fetch all available app settings."""
-        return self.client.send(
-            "/api/settings",
-            {"method": "GET", "params": query_params},
-        )
+        pass
 
     def update(
         self,
@@ -21,22 +18,11 @@ class SettingsService(BaseService):
         query_params: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Bulk updates app settings."""
-        return self.client.send(
-            "/api/settings",
-            {
-                "method": "PATCH",
-                "params": query_params,
-                "body": body_params,
-            },
-        )
+        pass
 
     def test_s3(self, query_params: dict[str, Any] | None = None) -> bool:
         """Performs a S3 storage connection test."""
-        self.client.send(
-            "/api/settings/test/s3",
-            {"method": "POST", "params": query_params},
-        )
-        return True
+        pass
 
     def test_email(
         self,
@@ -52,15 +38,7 @@ class SettingsService(BaseService):
         - password-reset
         - email-change
         """
-        self.client.send(
-            "/api/settings/test/email",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": {"email": to_email, "template": email_template},
-            },
-        )
-        return True
+        pass
 
     def generate_apple_client_secret(
         self,
@@ -71,18 +49,4 @@ class SettingsService(BaseService):
         duration: int,
         query_params: dict[str, Any] | None = None,
     ) -> str:
-        res = self.client.send(
-            "/api/settings/apple/generate-client-secret",
-            {
-                "method": "POST",
-                "params": query_params,
-                "body": {
-                    "clientId": client_id,
-                    "teamId": team_id,
-                    "keyId": key_id,
-                    "privateKey": private_key,
-                    "duration": duration,
-                },
-            },
-        )
-        return res.get("secret")
+        pass
